@@ -16,6 +16,7 @@ public abstract class Setting<T> {
         this.val = val;
         this.changeAction = setting -> {};
     }
+
     protected Setting(String name, T val) {
         this(name, val, val);
     }
