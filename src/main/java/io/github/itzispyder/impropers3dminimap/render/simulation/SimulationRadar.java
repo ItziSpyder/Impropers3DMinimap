@@ -168,7 +168,7 @@ public class SimulationRadar implements Global {
 
         Quaternionf rotationPitch = new Quaternionf().rotationX((float)Math.toRadians(p.getPitch()));
         Quaternionf rotationYaw = new Quaternionf().rotationY((float)Math.toRadians(p.getYaw() + 180));
-        simulation.render(context, cam, rotationPitch.mul(rotationYaw), renderBackground.getVal());
+        simulation.render(context, cam, rotationPitch.mul(rotationYaw), renderBackground.getVal(), borderRadius.getVal(), system.accent.getHex());
     }
 
     public void onJoin() {

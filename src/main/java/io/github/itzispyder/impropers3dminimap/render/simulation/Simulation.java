@@ -44,11 +44,13 @@ public class Simulation {
         this.method = method;
     }
 
-    public void render(DrawContext context, Vec3d camera, Quaternionf rotation, boolean renderBackground) {
-        int r = 5;
+    public void render(DrawContext context, Vec3d camera, Quaternionf rotation, boolean renderBackground, int borderRadius, int accentColor) {
+        int r = borderRadius;
 
-        if (renderBackground)
-            RenderUtils.fillRoundRect(context, x, y, width, height, r, Color.BLACK.getHex());
+        if (renderBackground) {
+            RenderUtils.fillRoundRect(context, x, y, width, height, r, accentColor);
+            RenderUtils.fillRect(context, x + r, y + r, width - r * 2, height - r * 2, Color.BLACK.getHex());
+        }
 
         if (renderer.worldSize() > 0) {
             context.enableScissor(x + r, y + r, x + width - r, y + height - r);

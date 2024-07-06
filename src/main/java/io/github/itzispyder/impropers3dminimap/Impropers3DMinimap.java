@@ -29,8 +29,6 @@ public class Impropers3DMinimap implements ModInitializer, Global {
 
     @Override
     public void onInitialize() {
-        config.save();
-
         Hud.addHud(new SimulationHud());
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -44,5 +42,8 @@ public class Impropers3DMinimap implements ModInitializer, Global {
             for (Hud hud : Hud.huds().values())
                 hud.render(drawContext);
         });
+
+        config.load();
+        config.save();
     }
 }

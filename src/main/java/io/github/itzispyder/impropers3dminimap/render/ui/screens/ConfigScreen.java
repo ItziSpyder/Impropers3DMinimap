@@ -23,19 +23,20 @@ public class ConfigScreen extends GuiScreen {
         this.window = new SettingWindow(config, 0, 0, "Improper's 3D Minimap", "Minimap but 3D!") {
             @Override
             public void onClose() {
-                ConfigScreen.this.removeChild(this);
+                ConfigScreen.this.removeChild(window);
+                mc.execute(() -> mc.setScreen(null));
             }
         };
         this.window.moveTo((w - window.width) / 2, (h - window.height) / 2);
         this.addChild(window);
 
         AbstractElement settings = AbstractElement.create()
-                .pos(mc.getWindow().getScaledWidth() - 10 - 50, 10)
-                .dimensions(50, 15)
+                .pos(window.x + window.width - 50 - 20, window.y + 3)
+                .dimensions(50, 10)
                 .onRender(AbstractElement.RENDER_BUTTON.apply(() -> "Edit Huds"))
                 .onPress(button -> mc.execute(() -> mc.setScreen(new HudEditScreen())))
                 .build();
-        this.addChild(settings);
+        window.addChild(settings);
     }
 
     @Override
@@ -50,5 +51,10 @@ public class ConfigScreen extends GuiScreen {
     @Override
     public void resize(MinecraftClient client, int width, int height) {
         client.setScreen(new ConfigScreen());
+    }
+
+    @Override
+    public void close() {
+        this.window.close();
     }
 }
