@@ -70,7 +70,7 @@ public abstract class Hud implements Positionable, Global {
     public void renderForeground(DrawContext context) {
         SimulationRadar radar = Impropers3DMinimap.radar;
         int r = radar.borderRadius.getVal();
-        RenderUtils.fillRoundRect(context, getX(), getY(), getWidth(), getHeight(), r, 0x80000000);
+        RenderUtils.fillRoundRect(context, getX(), getY(), getWidth(), getHeight(), r, Impropers3DMinimap.background.getHex());
 
         int cx = x + width / 2;
         int cy = y + height / 2;

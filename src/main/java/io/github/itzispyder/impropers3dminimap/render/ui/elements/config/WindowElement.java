@@ -38,7 +38,7 @@ public abstract class WindowElement extends GuiElement {
         SimulationRadar radar = Impropers3DMinimap.radar;
 
         int r = radar.borderRadius.getDef();
-        RenderUtils.fillRoundTabBottom(context, x, y + 16, width, height - 16, r, 0x80000000);
+        RenderUtils.fillRoundTabBottom(context, x, y + 16, width, height - 16, r, Impropers3DMinimap.background.getHex());
 
         renderTitleBar(context, mx, my);
         super.render(context, mx, my);

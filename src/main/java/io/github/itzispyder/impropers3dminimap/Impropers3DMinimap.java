@@ -21,7 +21,8 @@ public class Impropers3DMinimap implements ModInitializer {
     public static final Config config = JsonSerializable.load(Config.PATH, Config.class, new Config());
     public static final SimulationRadar radar = new SimulationRadar();
     public static final Scheduler scheduler = new Scheduler();
-    public static final Color accent = new Color(0xFFA434EB);
+    public static final Color accent = new Color(0xFF0080B3);
+    public static final Color background = new Color(0xB2000000);
 
     public static final KeyBinding BIND = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "binds.impropers3dminimap.menu",
