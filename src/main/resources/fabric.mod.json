@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "impropers3dminimap",
+  "version": "${version}",
+  "name": "Impropers3DMinimap",
+  "description": "Minimap but with 3d terrain!",
+  "authors": [
+    "ImproperIssues"
+  ],
+  "contact": {
+    "repo": "https://github.com/ItziSpyder/Impropers3DMinimap"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/impropers3dminimap/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "io.github.itzispyder.impropers3dminimap.client.Impropers3DMinimapClient"
+    ],
+    "main": [
+      "io.github.itzispyder.impropers3dminimap.Impropers3DMinimap"
+    ]
+  },
+  "mixins": [
+    "impropers3dminimap.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
