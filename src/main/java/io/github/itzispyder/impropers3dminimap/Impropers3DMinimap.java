@@ -2,6 +2,8 @@ package io.github.itzispyder.impropers3dminimap;
 
 import io.github.itzispyder.impropers3dminimap.config.Config;
 import io.github.itzispyder.impropers3dminimap.render.simulation.SimulationRadar;
+import io.github.itzispyder.impropers3dminimap.render.ui.hud.Hud;
+import io.github.itzispyder.impropers3dminimap.render.ui.hud.moveables.SimulationHud;
 import io.github.itzispyder.impropers3dminimap.render.ui.screens.ConfigScreen;
 import io.github.itzispyder.impropers3dminimap.util.math.Color;
 import io.github.itzispyder.impropers3dminimap.util.misc.JsonSerializable;
@@ -9,6 +11,7 @@ import io.github.itzispyder.impropers3dminimap.util.misc.Scheduler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -31,11 +34,18 @@ public class Impropers3DMinimap implements ModInitializer {
     public void onInitialize() {
         config.save();
 
+        Hud.addHud(new SimulationHud());
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (BIND.wasPressed()) {
                 client.setScreen(new ConfigScreen());
             }
             radar.onTick();
+        });
+        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
+            for (Hud hud : Hud.huds().values()) {
+                hud.render(drawContext);
+            }
         });
     }
 }

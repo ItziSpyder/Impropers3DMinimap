@@ -28,6 +28,8 @@ public abstract class WindowElement extends GuiElement {
 
         if (canAnimate) {
             float scale = (float) animator.getAnimation();
+            int x = this.x + this.width / 2;
+            int y = this.y + this.height / 2;
             context.getMatrices().push();
             context.getMatrices().scale(scale, scale, 1);
             context.getMatrices().translate(x / scale - x, y / scale - y, 0);
