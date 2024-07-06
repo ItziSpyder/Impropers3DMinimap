@@ -14,7 +14,6 @@ import java.util.List;
 public class HudEditScreen extends GuiScreen {
 
     private final List<MoveableHudElement> huds;
-    private boolean editing;
 
     public HudEditScreen() {
         super("Edit Hud Screen");
@@ -27,8 +26,8 @@ public class HudEditScreen extends GuiScreen {
         AbstractElement settings = AbstractElement.create()
                 .pos(mc.getWindow().getScaledWidth() - 10 - 50, 10)
                 .dimensions(50, 15)
-                .onRender(AbstractElement.RENDER_BUTTON.apply(() -> "Edit Huds"))
-                .onPress(button -> {})
+                .onRender(AbstractElement.RENDER_BUTTON.apply(() -> "Back"))
+                .onPress(button -> mc.execute(() -> mc.setScreen(new ConfigScreen())))
                 .build();
         this.addChild(settings);
     }

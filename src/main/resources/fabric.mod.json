@@ -3,7 +3,7 @@
   "id": "impropers3dminimap",
   "version": "${version}",
   "name": "Impropers3DMinimap",
-  "description": "Minimap but with 3d terrain!",
+  "description": "Minimap but with 3d terrain! MENU KEYBIND IS M",
   "authors": [
     "ImproperIssues"
   ],
