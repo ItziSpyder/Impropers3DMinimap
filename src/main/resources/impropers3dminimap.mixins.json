@@ -7,6 +7,7 @@
   ],
   "client": [
     "MixinClientPlayerEntity",
+    "MixinFontManager",
     "MixinMinecraftClient"
   ],
   "injectors": {

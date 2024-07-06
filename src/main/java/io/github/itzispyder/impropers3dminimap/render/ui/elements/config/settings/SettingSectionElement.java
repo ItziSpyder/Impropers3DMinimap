@@ -26,7 +26,7 @@ public class SettingSectionElement extends GuiElement {
     @Override
     public void onRender(DrawContext context, int mx, int my) {
         String text = section.getName();
-        int tw = mc.textRenderer.getWidth(text);
+        int tw = system.textRenderer.getWidth(text);
         int tx = x + (width - tw) / 2;
         int ty = y + 2;
         int lw = x + width - (tx + tw + 3);

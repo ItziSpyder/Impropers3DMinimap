@@ -1,6 +1,5 @@
 package io.github.itzispyder.impropers3dminimap.render.ui.elements.config.settings.types;
 
-import io.github.itzispyder.impropers3dminimap.Impropers3DMinimap;
 import io.github.itzispyder.impropers3dminimap.config.types.IntegerSetting;
 import io.github.itzispyder.impropers3dminimap.render.ui.GuiScreen;
 import io.github.itzispyder.impropers3dminimap.render.ui.elements.common.interactive.TextBoxElement;
@@ -75,7 +74,7 @@ public class IntegerSettingElement extends SettingElement<IntegerSetting> {
 
         int len = (int)(sliderWidth * MathUtils.clamp(ratio, 0, 1));
         this.fillEnd = x + len;
-        int color = Impropers3DMinimap.accent.getHex();
+        int color = system.accent.getHex();
 
         drawText(context, "§o" + setting.getName(), x, y + 10 / 3, 0.9F, false);
         fillRect(context, x, y + 10 + 10 / 3, sliderWidth, 2, 0xFF808080);

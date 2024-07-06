@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "impropers3dminimap:segoe-ui.ttf",
+      "oversample": 8.5,
+      "size": 8.5,
+      "shift": [0, -1.5]
+    }
+  ]
+}

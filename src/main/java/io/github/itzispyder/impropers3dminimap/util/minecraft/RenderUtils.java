@@ -440,7 +440,7 @@ public final class RenderUtils implements Global {
 
         float rescale = 1 / scale;
         centerX = (int)(centerX * rescale);
-        centerX = centerX - (mc.textRenderer.getWidth(text) / 2);
+        centerX = centerX - (system.textRenderer.getWidth(text) / 2);
         y = (int)(y * rescale);
 
         drawDefaultText(context, text, centerX, y, shadow, color);
@@ -453,7 +453,7 @@ public final class RenderUtils implements Global {
 
         float rescale = 1 / scale;
         rightX = (int)(rightX * rescale);
-        rightX = rightX - mc.textRenderer.getWidth(text);
+        rightX = rightX - system.textRenderer.getWidth(text);
         y = (int)(y * rescale);
 
         drawDefaultText(context, text, rightX, y, shadow, color);
@@ -473,7 +473,7 @@ public final class RenderUtils implements Global {
     }
 
     public static void drawDefaultText(DrawContext context, Text text, int x, int y, boolean shadow, int color) {
-        context.drawText(mc.textRenderer, text, x, y, color, shadow);
+        context.drawText(system.textRenderer, text, x, y, color, shadow);
     }
 
     // non-default
@@ -744,7 +744,7 @@ public final class RenderUtils implements Global {
         context.getMatrices().push();
         context.getMatrices().scale(scale, scale, scale);
         context.drawItem(item, x, y);
-        context.drawItemInSlot(mc.textRenderer, item, x, y);
+        context.drawItemInSlot(system.textRenderer, item, x, y);
         context.getMatrices().pop();
     }
 
@@ -754,7 +754,7 @@ public final class RenderUtils implements Global {
         context.getMatrices().push();
         context.getMatrices().scale(scale, scale, scale);
         context.drawItem(item, x, y);
-        context.drawItemInSlot(mc.textRenderer, item, x, y, text);
+        context.drawItemInSlot(system.textRenderer, item, x, y, text);
         context.getMatrices().pop();
     }
 

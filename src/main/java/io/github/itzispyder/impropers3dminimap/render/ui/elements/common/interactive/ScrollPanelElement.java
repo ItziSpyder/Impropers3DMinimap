@@ -1,6 +1,5 @@
 package io.github.itzispyder.impropers3dminimap.render.ui.elements.common.interactive;
 
-import io.github.itzispyder.impropers3dminimap.Impropers3DMinimap;
 import io.github.itzispyder.impropers3dminimap.render.animation.Animator;
 import io.github.itzispyder.impropers3dminimap.render.animation.PollingAnimator;
 import io.github.itzispyder.impropers3dminimap.render.ui.GuiElement;
@@ -93,7 +92,7 @@ public class ScrollPanelElement extends GuiElement {
 
         int gradientHeight = 10;
         int upH = (int)(gradientHeight * topShadow.getProgressClamped());
-        RenderUtils.fillVerticalGradient(context, x, y, width, upH, Impropers3DMinimap.background.getHex(), 0x00000000);
+        RenderUtils.fillVerticalGradient(context, x, y, width, upH, system.background.getHex(), 0x00000000);
 
         context.disableScissor();
     }

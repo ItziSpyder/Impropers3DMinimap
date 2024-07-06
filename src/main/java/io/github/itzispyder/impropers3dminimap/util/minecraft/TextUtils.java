@@ -17,7 +17,7 @@ public class TextUtils implements Global {
 
     public static List<String> wordWrap(String input, int width, float textScale) {
         List<String> result = new ArrayList<>();
-        var tr = mc.textRenderer;
+        var tr = system.textRenderer;
 
         if (input == null || input.isEmpty() || tr == null || width <= 0) {
             return result;
@@ -47,7 +47,7 @@ public class TextUtils implements Global {
 
     public static List<String> charWrap(String input, int width, float textScale) {
         List<String> result = new ArrayList<>();
-        var tr = mc.textRenderer;
+        var tr = system.textRenderer;
 
         if (input == null || input.isEmpty() || tr == null || width <= 0) {
             return result;
@@ -69,7 +69,7 @@ public class TextUtils implements Global {
     }
 
     public static int getSelectionMax(String input, int toWidth) {
-        var tr = mc.textRenderer;
+        var tr = system.textRenderer;
 
         if (tr == null || input.isEmpty()) {
             return 0;

@@ -38,7 +38,7 @@ public abstract class WindowElement extends GuiElement {
         SimulationRadar radar = Impropers3DMinimap.radar;
 
         int r = radar.borderRadius.getDef();
-        RenderUtils.fillRoundTabBottom(context, x, y + 16, width, height - 16, r, Impropers3DMinimap.background.getHex());
+        RenderUtils.fillRoundTabBottom(context, x, y + 16, width, height - 16, r, system.background.getHex());
 
         renderTitleBar(context, mx, my);
         super.render(context, mx, my);
@@ -66,7 +66,7 @@ public abstract class WindowElement extends GuiElement {
     public void close() {
         animator.reverse();
         animator.reset();
-        Impropers3DMinimap.scheduler.runDelayedTask(this::onClose, animator.getLength());
+        system.scheduler.runDelayedTask(this::onClose, animator.getLength());
     }
 
     public boolean canAnimate() {
@@ -83,7 +83,7 @@ public abstract class WindowElement extends GuiElement {
 
     public void renderTitleBar(DrawContext context, int mx, int my) {
         int r = Impropers3DMinimap.radar.borderRadius.getVal();
-        int accent = Impropers3DMinimap.accent.getHex();
+        int accent = system.accent.getHex();
         RenderUtils.fillRoundTabTop(context, x, y, width, 16 - r, r, accent);
         RenderUtils.fillRect(context, x, y + r, width, 16 - r, accent);
 

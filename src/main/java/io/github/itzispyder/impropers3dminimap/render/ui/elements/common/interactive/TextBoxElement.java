@@ -40,7 +40,7 @@ public class TextBoxElement extends GuiElement implements Typeable {
         }
 
         String text = query;
-        while (!text.isEmpty() && mc.textRenderer.getWidth(text) * 0.9F > width - height - 4) {
+        while (!text.isEmpty() && system.textRenderer.getWidth(text) * 0.9F > width - height - 4) {
             text = text.substring(1);
         }
 
@@ -54,14 +54,14 @@ public class TextBoxElement extends GuiElement implements Typeable {
             String defaultText = getDefaultText();
             StringBuilder sb = new StringBuilder();
             int i = 0;
-            while (i < defaultText.length() && mc.textRenderer.getWidth(sb.toString()) * 0.9F < width - height - 4) {
+            while (i < defaultText.length() && system.textRenderer.getWidth(sb.toString()) * 0.9F < width - height - 4) {
                 sb.append(defaultText.charAt(i++));
             }
             RenderUtils.drawText(context, sb.toString(), x + height / 2 + 2, y + height / 3, 0.9F, false);
         }
 
         if (selectionBlinking) {
-            int tx = (int)(x + height / 2 + 2 + mc.textRenderer.getWidth(text) * 0.9);
+            int tx = (int)(x + height / 2 + 2 + system.textRenderer.getWidth(text) * 0.9);
             int ty = y + 2;
             RenderUtils.drawVerLine(context, tx, ty, height - 4, 0xE0FFFFFF);
         }

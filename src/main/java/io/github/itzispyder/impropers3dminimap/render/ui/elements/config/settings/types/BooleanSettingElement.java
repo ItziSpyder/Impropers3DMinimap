@@ -1,6 +1,5 @@
 package io.github.itzispyder.impropers3dminimap.render.ui.elements.config.settings.types;
 
-import io.github.itzispyder.impropers3dminimap.Impropers3DMinimap;
 import io.github.itzispyder.impropers3dminimap.config.types.BooleanSetting;
 import io.github.itzispyder.impropers3dminimap.render.animation.Animator;
 import io.github.itzispyder.impropers3dminimap.render.animation.PollingAnimator;
@@ -24,7 +23,7 @@ public class BooleanSettingElement extends SettingElement<BooleanSetting> {
 
     @Override
     public void onRender(DrawContext context, int mx, int my) {
-        int color = Impropers3DMinimap.accent.getHex();
+        int color = system.accent.getHex();
 
         if (round) {
             RenderUtils.fillAnnulus(context, x + 4, y + 5, 4, 1, color);
