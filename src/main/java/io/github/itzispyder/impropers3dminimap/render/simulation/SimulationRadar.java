@@ -19,9 +19,20 @@ import java.util.concurrent.CompletableFuture;
 public class SimulationRadar implements Global {
 
     private final SettingSection scRadar = getConfig().createSettingSection("radar-settings");
+
+    /**
+     * PLEASE SEE setEnabled()
+     */
     public final Setting<Boolean> enabled = scRadar.add(getConfig().createBoolSetting()
             .name("enabled")
             .def(true)
+            .onSettingChange(setting -> {
+                boolean enabled = setting.getVal();
+                if (enabled)
+                    onEnable();
+                else
+                    onDisable();
+            })
             .build()
     );
     public final Setting<Dictionary<EntityType<?>>> targets = scRadar.add(getConfig().createEntitiesSetting()
@@ -111,6 +122,10 @@ public class SimulationRadar implements Global {
     private BlockPos previousPos;
     private int ticks;
 
+    public SimulationRadar() {
+
+    }
+
     public void onEnable() {
         onJoin();
     }
@@ -182,15 +197,8 @@ public class SimulationRadar implements Global {
     }
 
     public void setEnabled(boolean enabled) {
-        if (enabled == isEnabled())
-            return;
-
-        this.enabled.setVal(enabled);
-
-        if (enabled)
-            onEnable();
-        else
-            onDisable();
+        if (enabled != isEnabled())
+            this.enabled.setVal(enabled);
     }
 
     public enum Ratios {
