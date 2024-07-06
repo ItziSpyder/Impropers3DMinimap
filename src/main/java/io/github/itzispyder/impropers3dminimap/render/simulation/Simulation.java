@@ -92,7 +92,7 @@ public class Simulation {
 
     public void updateEntities(int radius, Dictionary<EntityType<?>> targets) {
         for (Entity ent : player.clientWorld.getEntities())
-            if (ent != null && ent.isAlive() && !ent.isSpectator() && ent.isLiving() && ent.distanceTo(player) <= radius)
+            if (ent != null && ent.isAlive() && !ent.isSpectator() && ent.distanceTo(player) <= radius)
                 if (ent != PlayerUtils.player() && targets.lookup(ent.getType()))
                     update(ent);
     }
