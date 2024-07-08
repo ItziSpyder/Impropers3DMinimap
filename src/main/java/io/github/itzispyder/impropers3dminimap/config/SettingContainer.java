@@ -22,6 +22,10 @@ public interface SettingContainer {
         return EntitiesSetting.create();
     }
 
+    default BlocksSetting.Builder createBlocksSetting() {
+        return BlocksSetting.create();
+    }
+
     default <T> DictionarySetting.Builder<T> createDictionarySetting(Class<T> keyType) {
         return DictionarySetting.create(keyType);
     }

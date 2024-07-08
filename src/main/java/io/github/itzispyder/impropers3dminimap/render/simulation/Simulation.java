@@ -4,6 +4,7 @@ import io.github.itzispyder.impropers3dminimap.util.math.Color;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.PlayerUtils;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderUtils;
 import io.github.itzispyder.impropers3dminimap.util.misc.Dictionary;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -44,6 +45,7 @@ public class Simulation {
         this.method = method;
     }
 
+
     public void render(DrawContext context, Vec3d camera, Quaternionf rotation, boolean renderBackground, int borderRadius, int accentColor) {
         int r = borderRadius;
 
@@ -76,7 +78,7 @@ public class Simulation {
         RenderUtils.finishRendering();
     }
 
-    public void update(int radius, boolean useMapColors) {
+    public void update(int radius, boolean useMapColors, Dictionary<Block> targets) {
         renderer.clear();
         Box box = player.getBoundingBox().expand(radius);
 
@@ -84,7 +86,7 @@ public class Simulation {
             for (double y = box.minY; y <= box.maxY; y++) {
                 for (double z = box.minZ; z <= box.maxZ; z++) {
                     BlockPos pos = new BlockPos((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z));
-                    update(pos, world.getBlockState(pos), useMapColors);
+                    update(pos, world.getBlockState(pos), useMapColors, targets);
                 }
             }
         }
@@ -97,8 +99,8 @@ public class Simulation {
                     update(ent);
     }
 
-    public void update(BlockPos pos, BlockState state, boolean useMapColors) {
-        renderer.update(world, pos, state, useMapColors);
+    public void update(BlockPos pos, BlockState state, boolean useMapColors, Dictionary<Block> targets) {
+        renderer.update(world, pos, state, useMapColors, targets.lookup(state.getBlock()));
     }
 
     public void update(Entity ent) {

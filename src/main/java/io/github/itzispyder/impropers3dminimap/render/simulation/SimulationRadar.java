@@ -7,6 +7,7 @@ import io.github.itzispyder.impropers3dminimap.render.ui.hud.Hud;
 import io.github.itzispyder.impropers3dminimap.render.ui.hud.moveables.SimulationHud;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.PlayerUtils;
 import io.github.itzispyder.impropers3dminimap.util.misc.Dictionary;
+import net.minecraft.block.Block;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
@@ -39,6 +40,10 @@ public class SimulationRadar implements Global {
             .name("targets")
             .build()
     );
+    public final Setting<Dictionary<Block>> highlights = scRadar.add(getConfig().createBlocksSetting()
+            .name("highlights")
+            .build()
+    );
     public final Setting<Integer> updateFrequency = scRadar.add(getConfig().createIntSetting()
             .name("update-frequency-seconds")
             .max(5)
@@ -54,35 +59,24 @@ public class SimulationRadar implements Global {
             .build()
     );
     private final SettingSection scHud = getConfig().createSettingSection("hud-settings");
+    public final Setting<Double> ratioScale = scHud.add(getConfig().createDoubleSetting()
+            .name("ratio-scale")
+            .decimalPlaces(1)
+            .max(3.0)
+            .min(2.0)
+            .def(1.0)
+            .onSettingChange(setting -> updateHud())
+            .build()
+    );
     public final Setting<Ratios> ratio = scHud.add(getConfig().createEnumSetting(Ratios.class)
             .name("ratio")
             .def(Ratios.RATIO_2_1)
-            .onSettingChange(setting -> {
-                Hud hud = Hud.get(SimulationHud.class);
-                if (hud == null)
-                    return;
-                Ratios ratio = setting.getVal();
-                hud.setWidth(ratio.width);
-                hud.setHeight(ratio.height);
-            })
+            .onSettingChange(setting -> updateHud())
             .build()
     );
     public final Setting<Boolean> renderBackground = scHud.add(getConfig().createBoolSetting()
             .name("render-background")
             .def(true)
-            .build()
-    );
-    public final Setting<Double> scale = scHud.add(getConfig().createDoubleSetting()
-            .name("scale")
-            .decimalPlaces(1)
-            .max(15.0)
-            .min(1.0)
-            .def(5.0)
-            .onSettingChange(self -> {
-                Simulation sim = getSimulation();
-                if (sim != null)
-                    sim.setMapScale(self.getVal().floatValue());
-            })
             .build()
     );
     public final Setting<Integer> borderRadius = scHud.add(getConfig().createIntSetting()
@@ -115,6 +109,19 @@ public class SimulationRadar implements Global {
             .min(1)
             .def(1000)
             .onSettingChange(self -> setFocalLength(self.getVal()))
+            .build()
+    );
+    public final Setting<Double> scale = scRender.add(getConfig().createDoubleSetting()
+            .name("scale")
+            .decimalPlaces(1)
+            .max(15.0)
+            .min(1.0)
+            .def(5.0)
+            .onSettingChange(self -> {
+                Simulation sim = getSimulation();
+                if (sim != null)
+                    sim.setMapScale(self.getVal().floatValue());
+            })
             .build()
     );
 
@@ -151,7 +158,7 @@ public class SimulationRadar implements Global {
 
         if (ticks++ >= max && canUpdate) {
             CompletableFuture.runAsync(() -> {
-                simulation.update(range.getVal(), useMapColors.getVal());
+                simulation.update(range.getVal(), useMapColors.getVal(), highlights.getVal());
             });
             previousPos = playerPos;
             ticks = 0;
@@ -201,18 +208,36 @@ public class SimulationRadar implements Global {
             this.enabled.setVal(enabled);
     }
 
+    public void updateHud() {
+        Hud hud = Hud.get(SimulationHud.class);
+        if (hud == null)
+            return;
+
+        Ratios ratio = this.ratio.getVal();
+        float scale = ratioScale.getVal().floatValue() * 100;
+        float a = ratio.a;
+        float b = ratio.b;
+        float c = (float) Math.sqrt(a * a + b * b);
+
+        int width = (int) (a / c * scale);
+        int height = (int) (b / c * scale);
+
+        hud.setWidth(width);
+        hud.setHeight(height);
+    }
+
     public enum Ratios {
-        RATIO_2_1(200, 100),
-        RATIO_4_3(200, 150),
-        RATIO_1_1(100, 100),
-        RATIO_3_4(150, 200),
-        RATIO_1_2(100, 100);
+        RATIO_2_1(2, 1),
+        RATIO_4_3(4, 3),
+        RATIO_1_1(1, 1),
+        RATIO_3_4(3, 4),
+        RATIO_1_2(1, 2);
 
-        public final int width, height;
+        public final int a, b;
 
-        Ratios(int width, int height) {
-            this.width = width;
-            this.height = height;
+        Ratios(int a, int b) {
+            this.a = a;
+            this.b = b;
         }
     }
 }

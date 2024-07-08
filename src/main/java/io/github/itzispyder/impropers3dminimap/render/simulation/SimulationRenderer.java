@@ -24,13 +24,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SimulationRenderer {
 
     private final Simulation simulation;
-    private final Map<BlockPos, SimulatedBlock> blocks;
+    private final Map<BlockPos, SimulatedBlock> blocks, highlightedBlocks;
     private final Map<Integer, Entity> entities;
     private final Animator radarPingAnimator;
 
     public SimulationRenderer(Simulation simulation) {
         this.simulation = simulation;
         this.blocks = new ConcurrentHashMap<>();
+        this.highlightedBlocks = new ConcurrentHashMap<>();
         this.entities = new HashMap<>();
         this.radarPingAnimator = new Animator(1000);
     }
@@ -47,6 +48,7 @@ public class SimulationRenderer {
         matrices.scale(scale, -scale, scale);
 
         renderWorld(context.getMatrices(), camera, rotation, origin);
+        renderWorldHighlighted(context.getMatrices(), camera, rotation, origin);
         renderEntities(context, camera, rotation, origin);
 
         matrices.pop();
@@ -57,6 +59,36 @@ public class SimulationRenderer {
         Matrix4f mat = matrices.peek().getPositionMatrix();
 
         for (SimulatedBlock block : blocks.values()) {
+            block.render(mat, buf, simulation, camera, rotation, origin);
+        }
+
+        BuiltBuffer draw = buf.endNullable();
+        boolean empty = draw == null;
+
+        if (empty)
+            return;
+
+        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+
+        BufferRenderer.drawWithGlobalProgram(draw);
+
+        RenderSystem.disableDepthTest();
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+    }
+
+    public void renderWorldHighlighted(MatrixStack matrices, Vec3d camera, Quaternionf rotation, Vec3d origin) {
+        BufferBuilder buf = RenderUtils.getBuffer(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        Matrix4f mat = matrices.peek().getPositionMatrix();
+
+        for (SimulatedBlock block : highlightedBlocks.values()) {
             block.render(mat, buf, simulation, camera, rotation, origin);
         }
 
@@ -117,18 +149,26 @@ public class SimulationRenderer {
         RenderUtils.finishRendering();
     }
 
-    public synchronized void update(BlockView world, BlockPos pos, boolean useMapColors) {
+    public synchronized void update(BlockView world, BlockPos pos, boolean useMapColors, boolean highlight) {
         if (pos != null && world != null) {
-            SimulatedBlock block = new SimulatedBlock(world, pos, useMapColors, simulation.getMethod());
-            if (block.isValid())
+            SimulatedBlock block = new SimulatedBlock(world, pos, useMapColors, simulation.getMethod(), highlight);
+            if (!block.isValid())
+                return;
+            if (highlight)
+                highlightedBlocks.put(pos, block);
+            else
                 blocks.put(pos, block);
         }
     }
 
-    public synchronized void update(BlockView world, BlockPos pos, BlockState state, boolean useMapColors) {
+    public synchronized void update(BlockView world, BlockPos pos, BlockState state, boolean useMapColors, boolean highlight) {
         if (pos != null && world != null && state != null) {
-            SimulatedBlock block = new SimulatedBlock(world, pos, state, useMapColors, simulation.getMethod());
-            if (block.isValid())
+            SimulatedBlock block = new SimulatedBlock(world, pos, state, useMapColors, simulation.getMethod(), highlight);
+            if (!block.isValid())
+                return;
+            if (highlight)
+                highlightedBlocks.put(pos, block);
+            else
                 blocks.put(pos, block);
         }
     }
@@ -140,6 +180,7 @@ public class SimulationRenderer {
 
     public void clearWorld() {
         blocks.clear();
+        highlightedBlocks.clear();
     }
 
     public void clearEntities() {
@@ -152,7 +193,7 @@ public class SimulationRenderer {
     }
 
     public int worldSize() {
-        return blocks.size();
+        return blocks.size() + highlightedBlocks.size();
     }
 
     public int entityCount() {

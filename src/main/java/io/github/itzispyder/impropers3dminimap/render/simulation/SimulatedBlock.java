@@ -21,26 +21,32 @@ public class SimulatedBlock {
     private final BlockPos pos;
     private final int color;
     private final boolean cullUp, cullDown, cullWest, cullEast, cullNorth, cullSouth;
+    private final boolean highlight;
 
-    public SimulatedBlock(BlockView world, BlockPos pos, boolean useMapColors, SimulationMethod method) {
-        this(world, pos, world.getBlockState(pos), useMapColors, method);
+    public SimulatedBlock(BlockView world, BlockPos pos, boolean useMapColors, SimulationMethod method, boolean highlight) {
+        this(world, pos, world.getBlockState(pos), useMapColors, method, highlight);
     }
 
-    public SimulatedBlock(BlockView world, BlockPos pos, BlockState state, boolean useMapColors, SimulationMethod method) {
+    public SimulatedBlock(BlockView world, BlockPos pos, BlockState state, boolean useMapColors, SimulationMethod method, boolean highlight) {
         this.world = world;
         this.pos = pos;
         this.block = state;
         this.collisions = state.getCollisionShape(world, pos).getBoundingBoxes();
+        this.highlight = highlight;
 
         boolean fullBlock = collisions.size() == 1 && collisions.getFirst().getAverageSideLength() == 1;
 
-        this.cullUp = fullBlock && shouldCullNeighbor(world, pos.add(0, 1, 0));
-        this.cullDown = fullBlock && shouldCullNeighbor(world, pos.add(0, -1, 0));
-        this.cullWest = fullBlock && shouldCullNeighbor(world, pos.add(-1, 0, 0));
-        this.cullEast = fullBlock && shouldCullNeighbor(world, pos.add(1, 0, 0));
-        this.cullNorth = fullBlock && shouldCullNeighbor(world, pos.add(0, 0, 1));
-        this.cullSouth = fullBlock && shouldCullNeighbor(world, pos.add(0, 0, -1));
+        this.cullUp = !highlight && fullBlock && shouldCullNeighbor(world, pos.add(0, 1, 0));
+        this.cullDown = !highlight && fullBlock && shouldCullNeighbor(world, pos.add(0, -1, 0));
+        this.cullWest = !highlight && fullBlock && shouldCullNeighbor(world, pos.add(-1, 0, 0));
+        this.cullEast = !highlight && fullBlock && shouldCullNeighbor(world, pos.add(1, 0, 0));
+        this.cullNorth = !highlight && fullBlock && shouldCullNeighbor(world, pos.add(0, 0, 1));
+        this.cullSouth = !highlight && fullBlock && shouldCullNeighbor(world, pos.add(0, 0, -1));
 
+        if (highlight) {
+            this.color = 0xFFFC552B;
+            return;
+        }
         if (useMapColors) {
             this.color = method.transparency << 24 | state.getMapColor(world, pos).color;
             return;
@@ -58,11 +64,15 @@ public class SimulatedBlock {
         Vec3d pos = getOffsetPos(camera);
 
         for (Box box : collisions) {
-            box(position, vertexConsumer, simulation, box, pos, rotation, origin);
+            SimulationMethod method = simulation.getMethod();
+            if (method == SimulationMethod.LINES || highlight)
+                boxLines(position, vertexConsumer, simulation, box, pos, rotation, origin);
+            else if (method == SimulationMethod.QUADS)
+                boxQuads(position, vertexConsumer, simulation, box, pos, rotation, origin);
         }
     }
 
-    private void box(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Box box, Vec3d offset, Quaternionf rotation, Vec3d origin) {
+    private void boxLines(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Box box, Vec3d offset, Quaternionf rotation, Vec3d origin) {
         float x1 = (float) (box.minX + offset.x);
         float y1 = (float) (box.minY + offset.y);
         float z1 = (float) (box.minZ + offset.z);
@@ -70,23 +80,29 @@ public class SimulatedBlock {
         float y2 = (float) (box.maxY + offset.y);
         float z2 = (float) (box.maxZ + offset.z);
 
-        if (simulation.getMethod() == SimulationMethod.LINES) {
-            line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z1,   x2, y1, z1); // bottom 4
-            line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z1,   x2, y1, z2);
-            line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z2,   x1, y1, z2);
-            line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z2,   x1, y1, z1);
+        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z1,   x2, y1, z1); // bottom 4
+        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z1,   x2, y1, z2);
+        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z2,   x1, y1, z2);
+        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z2,   x1, y1, z1);
 
-            line(position, vertexConsumer, simulation, rotation, origin,   x1, y2, z1,   x2, y2, z1); // top 4
-            line(position, vertexConsumer, simulation, rotation, origin,   x2, y2, z1,   x2, y2, z2);
-            line(position, vertexConsumer, simulation, rotation, origin,   x2, y2, z2,   x1, y2, z2);
-            line(position, vertexConsumer, simulation, rotation, origin,   x1, y2, z2,   x1, y2, z1);
+        line(position, vertexConsumer, simulation, rotation, origin,   x1, y2, z1,   x2, y2, z1); // top 4
+        line(position, vertexConsumer, simulation, rotation, origin,   x2, y2, z1,   x2, y2, z2);
+        line(position, vertexConsumer, simulation, rotation, origin,   x2, y2, z2,   x1, y2, z2);
+        line(position, vertexConsumer, simulation, rotation, origin,   x1, y2, z2,   x1, y2, z1);
 
-            line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z1,   x1, y2, z1); // pillars
-            line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z1,   x2, y2, z1);
-            line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z2,   x2, y2, z2);
-            line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z2,   x1, y2, z2);
-            return;
-        }
+        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z1,   x1, y2, z1); // pillars
+        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z1,   x2, y2, z1);
+        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z2,   x2, y2, z2);
+        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z2,   x1, y2, z2);
+    }
+
+    private void boxQuads(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Box box, Vec3d offset, Quaternionf rotation, Vec3d origin) {
+        float x1 = (float) (box.minX + offset.x);
+        float y1 = (float) (box.minY + offset.y);
+        float z1 = (float) (box.minZ + offset.z);
+        float x2 = (float) (box.maxX + offset.x);
+        float y2 = (float) (box.maxY + offset.y);
+        float z2 = (float) (box.maxZ + offset.z);
 
         if (!cullDown)
             quad(position, vertexConsumer, simulation, rotation, origin,
