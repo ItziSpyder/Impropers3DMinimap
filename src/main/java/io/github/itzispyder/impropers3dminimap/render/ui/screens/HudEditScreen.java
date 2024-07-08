@@ -21,7 +21,11 @@ public class HudEditScreen extends GuiScreen {
         this.huds = Hud.huds().values().stream()
                 .map(MoveableHudElement::new)
                 .toList();
-        huds.forEach(this::addChild);
+
+        for (MoveableHudElement hud : huds) {
+            hud.boundIn(RenderUtils.width(), RenderUtils.height());
+            this.addChild(hud);
+        }
 
         AbstractElement settings = AbstractElement.create()
                 .pos(mc.getWindow().getScaledWidth() - 10 - 50, 10)
