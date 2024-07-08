@@ -63,8 +63,8 @@ public class SimulationRadar implements Global {
             .name("ratio-scale")
             .decimalPlaces(1)
             .max(3.0)
-            .min(2.0)
-            .def(1.0)
+            .min(1.0)
+            .def(2.0)
             .onSettingChange(setting -> updateHud())
             .build()
     );
