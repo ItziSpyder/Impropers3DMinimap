@@ -8,7 +8,10 @@ Minimap but with 3D terrain! The keybind is `M`
 
 ![demo1](./assets/demo1.png)
 
-![demo1](./assets/demo2.png)
+![demo2](./assets/demo2.png)
+
+**You can also press `N` keybind to zoom in on the map:**
+![demo3](./assets/demo3.png)
 
 See entities on your radar with the targets selection in the menu!
 
