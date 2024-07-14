@@ -60,19 +60,19 @@ public class SimulatedBlock {
             this.color = 0xFFFFFFFF;
     }
 
-    public void render(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Vec3d camera, Quaternionf rotation, Vec3d origin) {
+    public void render(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Vec3d camera, Quaternionf rotation) {
         Vec3d pos = getOffsetPos(camera);
 
         for (Box box : collisions) {
             SimulationMethod method = simulation.getMethod();
             if (method == SimulationMethod.LINES || highlight)
-                boxLines(position, vertexConsumer, simulation, box, pos, rotation, origin);
+                boxLines(position, vertexConsumer, simulation, box, pos, rotation);
             else if (method == SimulationMethod.QUADS)
-                boxQuads(position, vertexConsumer, simulation, box, pos, rotation, origin);
+                boxQuads(position, vertexConsumer, simulation, box, pos, rotation);
         }
     }
 
-    private void boxLines(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Box box, Vec3d offset, Quaternionf rotation, Vec3d origin) {
+    private void boxLines(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Box box, Vec3d offset, Quaternionf rotation) {
         float x1 = (float) (box.minX + offset.x);
         float y1 = (float) (box.minY + offset.y);
         float z1 = (float) (box.minZ + offset.z);
@@ -80,23 +80,23 @@ public class SimulatedBlock {
         float y2 = (float) (box.maxY + offset.y);
         float z2 = (float) (box.maxZ + offset.z);
 
-        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z1,   x2, y1, z1); // bottom 4
-        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z1,   x2, y1, z2);
-        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z2,   x1, y1, z2);
-        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z2,   x1, y1, z1);
+        line(position, vertexConsumer, simulation, rotation,   x1, y1, z1,   x2, y1, z1); // bottom 4
+        line(position, vertexConsumer, simulation, rotation,   x2, y1, z1,   x2, y1, z2);
+        line(position, vertexConsumer, simulation, rotation,   x2, y1, z2,   x1, y1, z2);
+        line(position, vertexConsumer, simulation, rotation,   x1, y1, z2,   x1, y1, z1);
 
-        line(position, vertexConsumer, simulation, rotation, origin,   x1, y2, z1,   x2, y2, z1); // top 4
-        line(position, vertexConsumer, simulation, rotation, origin,   x2, y2, z1,   x2, y2, z2);
-        line(position, vertexConsumer, simulation, rotation, origin,   x2, y2, z2,   x1, y2, z2);
-        line(position, vertexConsumer, simulation, rotation, origin,   x1, y2, z2,   x1, y2, z1);
+        line(position, vertexConsumer, simulation, rotation,   x1, y2, z1,   x2, y2, z1); // top 4
+        line(position, vertexConsumer, simulation, rotation,   x2, y2, z1,   x2, y2, z2);
+        line(position, vertexConsumer, simulation, rotation,   x2, y2, z2,   x1, y2, z2);
+        line(position, vertexConsumer, simulation, rotation,   x1, y2, z2,   x1, y2, z1);
 
-        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z1,   x1, y2, z1); // pillars
-        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z1,   x2, y2, z1);
-        line(position, vertexConsumer, simulation, rotation, origin,   x2, y1, z2,   x2, y2, z2);
-        line(position, vertexConsumer, simulation, rotation, origin,   x1, y1, z2,   x1, y2, z2);
+        line(position, vertexConsumer, simulation, rotation,   x1, y1, z1,   x1, y2, z1); // pillars
+        line(position, vertexConsumer, simulation, rotation,   x2, y1, z1,   x2, y2, z1);
+        line(position, vertexConsumer, simulation, rotation,   x2, y1, z2,   x2, y2, z2);
+        line(position, vertexConsumer, simulation, rotation,   x1, y1, z2,   x1, y2, z2);
     }
 
-    private void boxQuads(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Box box, Vec3d offset, Quaternionf rotation, Vec3d origin) {
+    private void boxQuads(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Box box, Vec3d offset, Quaternionf rotation) {
         float x1 = (float) (box.minX + offset.x);
         float y1 = (float) (box.minY + offset.y);
         float z1 = (float) (box.minZ + offset.z);
@@ -105,7 +105,7 @@ public class SimulatedBlock {
         float z2 = (float) (box.maxZ + offset.z);
 
         if (!cullDown)
-            quad(position, vertexConsumer, simulation, rotation, origin,
+            quad(position, vertexConsumer, simulation, rotation,
                     new Vec3d(x1, y1, z1),
                     new Vec3d(x2, y1, z1),
                     new Vec3d(x2, y1, z2),
@@ -113,7 +113,7 @@ public class SimulatedBlock {
             ); // bottom
 
         if (!cullUp)
-            quad(position, vertexConsumer, simulation, rotation, origin,
+            quad(position, vertexConsumer, simulation, rotation,
                     new Vec3d(x1, y2, z1),
                     new Vec3d(x2, y2, z1),
                     new Vec3d(x2, y2, z2),
@@ -121,7 +121,7 @@ public class SimulatedBlock {
             ); // top
 
         if (!cullSouth)
-            quad(position, vertexConsumer, simulation, rotation, origin,
+            quad(position, vertexConsumer, simulation, rotation,
                     new Vec3d(x1, y1, z1),
                     new Vec3d(x2, y1, z1),
                     new Vec3d(x2, y2, z1),
@@ -129,7 +129,7 @@ public class SimulatedBlock {
             ); // front
 
         if (!cullNorth)
-            quad(position, vertexConsumer, simulation, rotation, origin,
+            quad(position, vertexConsumer, simulation, rotation,
                     new Vec3d(x1, y1, z2),
                     new Vec3d(x2, y1, z2),
                     new Vec3d(x2, y2, z2),
@@ -137,7 +137,7 @@ public class SimulatedBlock {
             ); // back
 
         if (!cullWest)
-            quad(position, vertexConsumer, simulation, rotation, origin,
+            quad(position, vertexConsumer, simulation, rotation,
                     new Vec3d(x1, y1, z1),
                     new Vec3d(x1, y2, z1),
                     new Vec3d(x1, y2, z2),
@@ -145,7 +145,7 @@ public class SimulatedBlock {
             ); // left
 
         if (!cullEast)
-            quad(position, vertexConsumer, simulation, rotation, origin,
+            quad(position, vertexConsumer, simulation, rotation,
                     new Vec3d(x2, y1, z1),
                     new Vec3d(x2, y2, z1),
                     new Vec3d(x2, y2, z2),
@@ -153,11 +153,11 @@ public class SimulatedBlock {
             ); // right
     }
 
-    private void quad(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Quaternionf rotation, Vec3d origin, Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4) {
-        Vec2f pix1 = simulation.projectVector(v1, rotation, origin);
-        Vec2f pix2 = simulation.projectVector(v2, rotation, origin);
-        Vec2f pix3 = simulation.projectVector(v3, rotation, origin);
-        Vec2f pix4 = simulation.projectVector(v4, rotation, origin);
+    private void quad(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Quaternionf rotation, Vec3d v1, Vec3d v2, Vec3d v3, Vec3d v4) {
+        Vec2f pix1 = simulation.projectVector(v1, rotation);
+        Vec2f pix2 = simulation.projectVector(v2, rotation);
+        Vec2f pix3 = simulation.projectVector(v3, rotation);
+        Vec2f pix4 = simulation.projectVector(v4, rotation);
 
         if (simulation.outOfBounds(pix1, pix2, pix3, pix4))
             return;
@@ -168,9 +168,9 @@ public class SimulatedBlock {
         vertexConsumer.vertex(position, pix4.x, pix4.y, 0).color(color);
     }
 
-    private void line(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Quaternionf rotation, Vec3d origin, double x1, double y1, double z1, double x2, double y2, double z2) {
-        Vec2f pix1 = simulation.projectVector(new Vec3d(x1, y1, z1), rotation, origin);
-        Vec2f pix2 = simulation.projectVector(new Vec3d(x2, y2, z2), rotation, origin);
+    private void line(Matrix4f position, BufferBuilder vertexConsumer, Simulation simulation, Quaternionf rotation, double x1, double y1, double z1, double x2, double y2, double z2) {
+        Vec2f pix1 = simulation.projectVector(new Vec3d(x1, y1, z1), rotation);
+        Vec2f pix2 = simulation.projectVector(new Vec3d(x2, y2, z2), rotation);
 
         if (simulation.outOfBounds(pix1, pix2))
             return;

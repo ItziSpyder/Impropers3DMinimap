@@ -32,8 +32,8 @@ public class Simulation {
     private float mapScale;
     private SimulationMethod method;
 
-    public Simulation(ClientPlayerEntity player, int x, int y, int w, int h, float mapScale, SimulationMethod method) {
-        this.focalPoint = new Vec3d(x + w / 2.0, y + h / 2.0, 200);
+    public Simulation(ClientPlayerEntity player, int x, int y, int w, int h, float mapScale, SimulationMethod method, long focalLength) {
+        this.focalPoint = new Vec3d(x + w / 2.0, y + h / 2.0, focalLength);
         this.player = player;
         this.world = player.getWorld();
         this.renderer = new SimulationRenderer(this);
@@ -56,7 +56,7 @@ public class Simulation {
 
         if (renderer.worldSize() > 0) {
             context.enableScissor(x + r, y + r, x + width - r, y + height - r);
-            renderer.render(context, camera, rotation, x, y, width, height, mapScale);
+            renderer.render(context, camera, rotation, mapScale);
             context.disableScissor();
         }
 
@@ -117,9 +117,17 @@ public class Simulation {
         return projectVector(transform.x, transform.y, transform.z);
     }
 
+    public Vec2f projectVector(Vec3d vec, Quaternionf rotation) {
+        Vector3f transform = rotation.transform(vec.toVector3f());
+        return projectVector(transform.x, transform.y, transform.z);
+    }
+
     public Vec2f projectVector(double x, double y, double z) {
-        double focal = focalPoint.z;
+        double focal = -focalPoint.z;
         double depth = focal + z;
+        if (depth >= -0.1)
+            depth = -0.1;
+
         float px = (float)(focal * x / depth);
         float py = (float)(focal * y / depth);
         //System.out.printf("PROJECT [%s, %s, %s] -> [%s, %s]%n".formatted((int)x, (int)y, (int)z, (int)px, (int)py));

@@ -48,7 +48,7 @@ public class SimulationRadar implements Global {
             .name("update-frequency-seconds")
             .max(5)
             .min(1)
-            .def(2)
+            .def(1)
             .build()
     );
     public final Setting<Integer> range = scRadar.add(getConfig().createIntSetting()
@@ -83,7 +83,7 @@ public class SimulationRadar implements Global {
             .name("border-radius")
             .max(8)
             .min(3)
-            .def(4)
+            .def(3)
             .build()
     );
     private final SettingSection scRender = getConfig().createSettingSection("render-settings");
@@ -107,7 +107,7 @@ public class SimulationRadar implements Global {
             .name("focal-length")
             .max(1000)
             .min(1)
-            .def(1000)
+            .def(10)
             .onSettingChange(self -> setFocalLength(self.getVal()))
             .build()
     );
@@ -116,7 +116,7 @@ public class SimulationRadar implements Global {
             .decimalPlaces(1)
             .max(15.0)
             .min(1.0)
-            .def(5.0)
+            .def(4.0)
             .onSettingChange(self -> {
                 Simulation sim = getSimulation();
                 if (sim != null)
@@ -186,7 +186,7 @@ public class SimulationRadar implements Global {
         simulation = new Simulation(
                 PlayerUtils.player(),
                 hud.getX(), hud.getY(), hud.getWidth(), hud.getHeight(),
-                scale.getVal().floatValue(), drawMode.getVal()
+                scale.getVal().floatValue(), drawMode.getVal(), focalLength.getVal()
         );
     }
 

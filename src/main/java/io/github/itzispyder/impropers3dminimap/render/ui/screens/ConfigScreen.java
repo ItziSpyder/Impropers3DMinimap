@@ -25,6 +25,7 @@ public class ConfigScreen extends GuiScreen {
             public void onClose() {
                 ConfigScreen.this.removeChild(window);
                 mc.execute(() -> mc.setScreen(null));
+                config.save();
             }
         };
         this.window.moveTo((w - window.width) / 2, (h - window.height) / 2);
@@ -56,5 +57,12 @@ public class ConfigScreen extends GuiScreen {
     @Override
     public void close() {
         this.window.close();
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        super.mouseReleased(mouseX, mouseY, button);
+        Impropers3DMinimap.config.save();
+        return true;
     }
 }

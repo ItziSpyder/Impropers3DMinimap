@@ -9,9 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.BlockView;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -24,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SimulationRenderer {
 
     private final Simulation simulation;
-    private final Map<BlockPos, SimulatedBlock> blocks, highlightedBlocks;
+    private final Map<ChunkPos, Map<BlockPos, SimulatedBlock>> blocks, highlightedBlocks;
     private final Map<Integer, Entity> entities;
     private final Animator radarPingAnimator;
 
@@ -36,10 +34,10 @@ public class SimulationRenderer {
         this.radarPingAnimator = new Animator(1000);
     }
 
-    public void render(DrawContext context, Vec3d camera, Quaternionf rotation, int x, int y, int w, int h, float scale) {
-        int originX = x + w / 2;
-        int originY = y + h / 2;
-        Vec3d origin = new Vec3d(0, 0, 0);
+    public void render(DrawContext context, Vec3d camera, Quaternionf rotation, float scale) {
+        Vec3d focalPoint = simulation.getFocalPoint();
+        int originX = (int) focalPoint.x;
+        int originY = (int) focalPoint.y;
 
         MatrixStack matrices = context.getMatrices();
 
@@ -47,20 +45,20 @@ public class SimulationRenderer {
         matrices.translate(originX, originY, 0);
         matrices.scale(scale, -scale, scale);
 
-        renderWorld(context.getMatrices(), camera, rotation, origin);
-        renderWorldHighlighted(context.getMatrices(), camera, rotation, origin);
-        renderEntities(context, camera, rotation, origin);
+        renderWorld(context.getMatrices(), camera, rotation);
+        renderWorldHighlighted(context.getMatrices(), camera, rotation);
+        renderEntities(context, camera, rotation);
 
         matrices.pop();
     }
 
-    public void renderWorld(MatrixStack matrices, Vec3d camera, Quaternionf rotation, Vec3d origin) {
+    public void renderWorld(MatrixStack matrices, Vec3d camera, Quaternionf rotation) {
         BufferBuilder buf = RenderUtils.getBuffer(simulation.getMethod().drawMode, VertexFormats.POSITION_COLOR);
         Matrix4f mat = matrices.peek().getPositionMatrix();
 
-        for (SimulatedBlock block : blocks.values()) {
-            block.render(mat, buf, simulation, camera, rotation, origin);
-        }
+        for (var chunk : blocks.values())
+            for (var block : chunk.values())
+                block.render(mat, buf, simulation, camera, rotation);
 
         BuiltBuffer draw = buf.endNullable();
         boolean empty = draw == null;
@@ -84,13 +82,13 @@ public class SimulationRenderer {
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
     }
 
-    public void renderWorldHighlighted(MatrixStack matrices, Vec3d camera, Quaternionf rotation, Vec3d origin) {
+    public void renderWorldHighlighted(MatrixStack matrices, Vec3d camera, Quaternionf rotation) {
         BufferBuilder buf = RenderUtils.getBuffer(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         Matrix4f mat = matrices.peek().getPositionMatrix();
 
-        for (SimulatedBlock block : highlightedBlocks.values()) {
-            block.render(mat, buf, simulation, camera, rotation, origin);
-        }
+        for (var chunk : highlightedBlocks.values())
+            for (var block : chunk.values())
+                block.render(mat, buf, simulation, camera, rotation);
 
         BuiltBuffer draw = buf.endNullable();
         boolean empty = draw == null;
@@ -114,7 +112,7 @@ public class SimulationRenderer {
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
     }
 
-    public void renderEntities(DrawContext context, Vec3d camera, Quaternionf rotation, Vec3d origin) {
+    public void renderEntities(DrawContext context, Vec3d camera, Quaternionf rotation) {
         if (radarPingAnimator.isFinished()) {
             radarPingAnimator.reverse();
             radarPingAnimator.reset();
@@ -124,7 +122,7 @@ public class SimulationRenderer {
         float radius = 1.0F;
 
         for (Entity ent : entities.values()) {
-            Vec2f pos = simulation.projectVector(ent.getPos().subtract(camera), rotation, origin);
+            Vec2f pos = simulation.projectVector(ent.getPos().subtract(camera), rotation);
             Color color = simulation.outOfBounds(pos.x, pos.y) ? Color.ORANGE : Color.RED;
             fillCircle(context, pos.x, pos.y, 0.5F + radius * animation, color.getHexCustomAlpha(0.5));
             fillCircle(context, pos.x, pos.y, 0.333F, color.getHex());
@@ -154,10 +152,11 @@ public class SimulationRenderer {
             SimulatedBlock block = new SimulatedBlock(world, pos, useMapColors, simulation.getMethod(), highlight);
             if (!block.isValid())
                 return;
-            if (highlight)
-                highlightedBlocks.put(pos, block);
-            else
-                blocks.put(pos, block);
+
+            ChunkPos chunkPos = ChunkSectionPos.from(pos).toChunkPos();
+            var chunk = highlight ? highlightedBlocks : blocks;
+            var blocks = chunk.computeIfAbsent(chunkPos, cp -> new ConcurrentHashMap<>());
+            blocks.put(pos, block);
         }
     }
 
@@ -166,10 +165,11 @@ public class SimulationRenderer {
             SimulatedBlock block = new SimulatedBlock(world, pos, state, useMapColors, simulation.getMethod(), highlight);
             if (!block.isValid())
                 return;
-            if (highlight)
-                highlightedBlocks.put(pos, block);
-            else
-                blocks.put(pos, block);
+
+            ChunkPos chunkPos = ChunkSectionPos.from(pos).toChunkPos();
+            var chunk = highlight ? highlightedBlocks : blocks;
+            var blocks = chunk.computeIfAbsent(chunkPos, cp -> new ConcurrentHashMap<>());
+            blocks.put(pos, block);
         }
     }
 
