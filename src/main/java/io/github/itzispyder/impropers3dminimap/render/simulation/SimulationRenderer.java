@@ -3,6 +3,7 @@ package io.github.itzispyder.impropers3dminimap.render.simulation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.itzispyder.impropers3dminimap.render.animation.Animator;
 import io.github.itzispyder.impropers3dminimap.util.math.Color;
+import io.github.itzispyder.impropers3dminimap.util.math.MathUtils;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.DrawContext;
@@ -34,10 +35,10 @@ public class SimulationRenderer {
         this.radarPingAnimator = new Animator(1000);
     }
 
-    public void render(DrawContext context, Vec3d camera, Quaternionf rotation, float scale) {
-        Vec3d focalPoint = simulation.getFocalPoint();
+    public void render(DrawContext context, Vec3d camera, Vec3d focalPoint, Quaternionf rotation, float scale, double zoomDelta) {
         int originX = (int) focalPoint.x;
         int originY = (int) focalPoint.y;
+        scale = (float) MathUtils.lerpClamped(scale, 4.0, zoomDelta);
 
         MatrixStack matrices = context.getMatrices();
 

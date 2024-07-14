@@ -1,6 +1,8 @@
 package io.github.itzispyder.impropers3dminimap.render.simulation;
 
+import io.github.itzispyder.impropers3dminimap.Impropers3DMinimap;
 import io.github.itzispyder.impropers3dminimap.util.math.Color;
+import io.github.itzispyder.impropers3dminimap.util.math.MathUtils;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.PlayerUtils;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderUtils;
 import io.github.itzispyder.impropers3dminimap.util.misc.Dictionary;
@@ -31,6 +33,7 @@ public class Simulation {
     private int x, y, width, height;
     private float mapScale;
     private SimulationMethod method;
+    public double zoomDelta;
 
     public Simulation(ClientPlayerEntity player, int x, int y, int w, int h, float mapScale, SimulationMethod method, long focalLength) {
         this.focalPoint = new Vec3d(x + w / 2.0, y + h / 2.0, focalLength);
@@ -48,6 +51,26 @@ public class Simulation {
 
     public void render(DrawContext context, Vec3d camera, Quaternionf rotation, boolean renderBackground, int borderRadius, int accentColor) {
         int r = borderRadius;
+        zoomDelta = Impropers3DMinimap.radar.zoomAnimator.getAnimation();
+
+        int x = this.x;
+        int y = this.y;
+        int width = this.width;
+        int height = this.height;
+        int winW = RenderUtils.width();
+        int winH = RenderUtils.height();
+
+        if (zoomDelta > 0) {
+            int destW = 420;
+            int destH = 240;
+            int destX = (winW - destW) / 2;
+            int destY = (winH - destH) / 2;
+
+            x = (int) MathUtils.lerpClamped(x, destX, zoomDelta);
+            y = (int) MathUtils.lerpClamped(y, destY, zoomDelta);
+            width = (int) MathUtils.lerpClamped(width, destW, zoomDelta);
+            height = (int) MathUtils.lerpClamped(height, destH, zoomDelta);
+        }
 
         if (renderBackground) {
             RenderUtils.fillRoundRect(context, x, y, width, height, r, accentColor);
@@ -55,8 +78,12 @@ public class Simulation {
         }
 
         if (renderer.worldSize() > 0) {
+            Vec3d focal = this.focalPoint;
+            if (zoomDelta > 0)
+                focal = new Vec3d(MathUtils.lerpClamped(focal.x, winW / 2F, zoomDelta), MathUtils.lerpClamped(focal.y, winH / 2F, zoomDelta), focal.z);
+
             context.enableScissor(x + r, y + r, x + width - r, y + height - r);
-            renderer.render(context, camera, rotation, mapScale);
+            renderer.render(context, camera, focal, rotation, mapScale, zoomDelta);
             context.disableScissor();
         }
 
@@ -123,7 +150,7 @@ public class Simulation {
     }
 
     public Vec2f projectVector(double x, double y, double z) {
-        double focal = -focalPoint.z;
+        double focal = -MathUtils.lerpClamped(focalPoint.z, 10, zoomDelta);
         double depth = focal + z;
         if (depth >= -0.1)
             depth = -0.1;

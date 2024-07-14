@@ -1,4 +1,5 @@
 {
   "binds.impropers3dminimap": "Improper's 3D Minimap",
-  "binds.impropers3dminimap.menu": "Open menu"
+  "binds.impropers3dminimap.menu": "Open menu",
+  "binds.impropers3dminimap.zoom": "Zoom In On Map"
 }

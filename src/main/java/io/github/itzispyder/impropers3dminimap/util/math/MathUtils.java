@@ -14,11 +14,11 @@ public final class MathUtils {
         return Math.min(max, Math.max(min, val));
     }
 
-    public static double progress(double start, double end, double progress) {
+    public static double lerp(double start, double end, double progress) {
         return start + (end - start) * progress;
     }
 
-    public static double progressClamped(double start, double end, double progress) {
+    public static double lerpClamped(double start, double end, double progress) {
         return start + (end - start) * clamp(progress, 0, 1);
     }
 

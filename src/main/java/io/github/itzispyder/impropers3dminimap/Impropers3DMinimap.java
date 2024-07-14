@@ -17,22 +17,28 @@ import org.lwjgl.glfw.GLFW;
 
 public class Impropers3DMinimap implements ModInitializer, Global {
 
-    public static final Config config = JsonSerializable.load(Config.PATH, Config.class, new Config());
-    public static final SimulationRadar radar = new SimulationRadar();
-
-    public static final KeyBinding BIND = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyBinding BIND_MENU = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "binds.impropers3dminimap.menu",
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_M,
             "binds.impropers3dminimap"
     ));
+    public static final KeyBinding BIND_ZOOM = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "binds.impropers3dminimap.zoom",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_N,
+            "binds.impropers3dminimap"
+    ));
+
+    public static final Config config = JsonSerializable.load(Config.PATH, Config.class, new Config());
+    public static final SimulationRadar radar = new SimulationRadar();
 
     @Override
     public void onInitialize() {
         Hud.addHud(new SimulationHud());
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (BIND.wasPressed())
+            while (BIND_MENU.wasPressed())
                 client.setScreen(new ConfigScreen());
             radar.onTick();
         });

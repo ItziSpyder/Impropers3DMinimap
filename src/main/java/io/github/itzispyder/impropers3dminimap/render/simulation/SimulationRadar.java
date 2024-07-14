@@ -1,8 +1,12 @@
 package io.github.itzispyder.impropers3dminimap.render.simulation;
 
 import io.github.itzispyder.impropers3dminimap.Global;
+import io.github.itzispyder.impropers3dminimap.Impropers3DMinimap;
 import io.github.itzispyder.impropers3dminimap.config.Setting;
 import io.github.itzispyder.impropers3dminimap.config.SettingSection;
+import io.github.itzispyder.impropers3dminimap.render.animation.Animations;
+import io.github.itzispyder.impropers3dminimap.render.animation.Animator;
+import io.github.itzispyder.impropers3dminimap.render.animation.PollingAnimator;
 import io.github.itzispyder.impropers3dminimap.render.ui.hud.Hud;
 import io.github.itzispyder.impropers3dminimap.render.ui.hud.moveables.SimulationHud;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.PlayerUtils;
@@ -124,6 +128,8 @@ public class SimulationRadar implements Global {
             })
             .build()
     );
+
+    public final Animator zoomAnimator = new PollingAnimator(300, Impropers3DMinimap.BIND_ZOOM::isPressed, Animations.FADE_IN_AND_OUT);
 
     private Simulation simulation;
     private BlockPos previousPos;
