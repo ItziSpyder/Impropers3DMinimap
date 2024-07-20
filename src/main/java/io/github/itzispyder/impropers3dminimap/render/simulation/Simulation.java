@@ -158,8 +158,8 @@ public class Simulation {
     }
 
     public Vec2f projectVector(double x, double y, double z) {
-        double focal = -MathUtils.lerpClamped(focalPoint.z, 0.001, zoomDelta);
-        double depth = MathUtils.lerpClamped(focal + z, (focal + z) * 0.0025, zoomDelta);
+        double focal = -MathUtils.lerpClamped(focalPoint.z, 1, zoomDelta);
+        double depth = MathUtils.lerpClamped(focal + z, (focal + z) * 0.055, zoomDelta);
         if (depth >= 0)
             depth = -0.00000000000000000000000000000000001;
 
