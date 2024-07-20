@@ -251,6 +251,48 @@ public final class RenderUtils implements Global {
         finishRendering();
     }
 
+    public static void fillRoundShadowGradient(DrawContext context, int x, int y, int w, int h, int r, int thickness,
+                                               int inner1, int outer1, int inner2, int outer2, int inner3, int outer3, int inner4, int outer4) {
+        r = MathUtils.clamp(r, 0, Math.min(w, h) / 2);
+
+        BufferBuilder buf = getBuffer(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
+        Matrix4f mat = context.getMatrices().peek().getPositionMatrix();
+
+        int[][] corners = {
+                { x + w - r, y + r },
+                { x + w - r, y + h - r},
+                { x + r, y + h - r },
+                { x + r, y + r }
+        };
+        int[][] colors = {
+                { inner1, outer1 },
+                { inner2, outer2 },
+                { inner3, outer3 },
+                { inner4, outer4 }
+        };
+
+        for (int corner = 0; corner < 4; corner++) {
+            int cornerStart = (corner - 1) * 90;
+            int cornerEnd = cornerStart + 90;
+            for (int i = cornerStart; i <= cornerEnd; i += 10) {
+                float angle = (float)Math.toRadians(i);
+                float rx1 = corners[corner][0] + (float)(Math.cos(angle) * r);
+                float ry1 = corners[corner][1] + (float)(Math.sin(angle) * r);
+                float rx2 = corners[corner][0] + (float)(Math.cos(angle) * (r + thickness));
+                float ry2 = corners[corner][1] + (float)(Math.sin(angle) * (r + thickness));
+                buf.vertex(mat, rx1, ry1, 0).color(colors[corner][0]);
+                buf.vertex(mat, rx2, ry2, 0).color(colors[corner][1]);
+            }
+        }
+
+        buf.vertex(mat, corners[0][0], y, 0).color(colors[0][0]); // connect last to first vertex
+        buf.vertex(mat, corners[0][0], y - thickness, 0).color(colors[0][1]); // connect last to first vertex
+
+        beginRendering();
+        drawBuffer(buf);
+        finishRendering();
+    }
+
     public static void fillRoundShadow(DrawContext context, int x, int y, int w, int h, int r, int thickness, int color) {
         fillRoundShadow(context, x, y, w, h, r, thickness, color, new Color(color).getHexCustomAlpha(0.0));
     }

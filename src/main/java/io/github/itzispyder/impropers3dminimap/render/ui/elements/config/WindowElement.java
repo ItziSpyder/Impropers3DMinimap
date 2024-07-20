@@ -6,6 +6,7 @@ import io.github.itzispyder.impropers3dminimap.render.animation.Animator;
 import io.github.itzispyder.impropers3dminimap.render.simulation.SimulationRadar;
 import io.github.itzispyder.impropers3dminimap.render.ui.GuiElement;
 import io.github.itzispyder.impropers3dminimap.render.ui.GuiScreen;
+import io.github.itzispyder.impropers3dminimap.util.math.Color;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderUtils;
 import net.minecraft.client.gui.DrawContext;
 
@@ -42,6 +43,14 @@ public abstract class WindowElement extends GuiElement {
 
         renderTitleBar(context, mx, my);
         super.render(context, mx, my);
+
+        Color color1 = Color.AQUA;
+        Color color2 = Color.MAGENTA;
+        int c11 = color1.getHex();
+        int c12 = color2.getHex();
+        int c01 = color1.getHexCustomAlpha(0.0);
+        int c02 = color2.getHexCustomAlpha(0.0);
+        RenderUtils.fillRoundShadowGradient(context, x, y, width, height, r, 3, c11, c02, c12, c01, c11, c02, c12, c01);
 
         if (canAnimate)
             context.getMatrices().pop();
@@ -94,7 +103,11 @@ public abstract class WindowElement extends GuiElement {
         }
 
         RenderUtils.drawText(context, title, x + 10, y + 16 / 3, false);
-        RenderUtils.drawText(context, "x", x + width - 16 + 16 / 3, y + 16 / 3, false);
+
+        int cx = x + width - 16 / 2;
+        int cy = y + 16 / 2;
+        RenderUtils.drawLine(context, cx - 3, cy - 3, cx + 3, cy + 3, 0xFFFFFFFF);
+        RenderUtils.drawLine(context, cx + 3, cy - 3, cx - 3, cy + 3, 0xFFFFFFFF);
     }
 
     public boolean isHoveringTitle(int mx, int my) {

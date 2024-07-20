@@ -19,7 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SimulationRadar implements Global {
 
@@ -131,6 +132,8 @@ public class SimulationRadar implements Global {
 
     public final Animator zoomAnimator = new PollingAnimator(300, Impropers3DMinimap.BIND_ZOOM::isPressed, Animations.FADE_IN_AND_OUT);
 
+    private final ExecutorService asyncExecutor = Executors.newFixedThreadPool(4);
+
     private Simulation simulation;
     private BlockPos previousPos;
     private int ticks;
@@ -163,7 +166,7 @@ public class SimulationRadar implements Global {
         boolean canUpdate = previousPos == null || !previousPos.equals(playerPos);
 
         if (ticks++ >= max && canUpdate) {
-            CompletableFuture.runAsync(() -> {
+            asyncExecutor.submit(() -> {
                 simulation.update(range.getVal(), useMapColors.getVal(), highlights.getVal());
             });
             previousPos = playerPos;

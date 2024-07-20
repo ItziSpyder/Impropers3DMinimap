@@ -75,6 +75,14 @@ public class Simulation {
         if (renderBackground) {
             RenderUtils.fillRoundRect(context, x, y, width, height, r, accentColor);
             RenderUtils.fillRect(context, x + r, y + r, width - r * 2, height - r * 2, Color.BLACK.getHex());
+
+            Color color1 = Color.AQUA;
+            Color color2 = Color.MAGENTA;
+            int c11 = color1.getHex();
+            int c12 = color2.getHex();
+            int c01 = color1.getHexCustomAlpha(0.0);
+            int c02 = color2.getHexCustomAlpha(0.0);
+            RenderUtils.fillRoundShadowGradient(context, x, y, width, height, r, 3, c11, c02, c12, c01, c11, c02, c12, c01);
         }
 
         if (renderer.worldSize() > 0) {
@@ -150,10 +158,10 @@ public class Simulation {
     }
 
     public Vec2f projectVector(double x, double y, double z) {
-        double focal = -MathUtils.lerpClamped(focalPoint.z, 10, zoomDelta);
-        double depth = focal + z;
-        if (depth >= -0.1)
-            depth = -0.1;
+        double focal = -MathUtils.lerpClamped(focalPoint.z, 0.001, zoomDelta);
+        double depth = MathUtils.lerpClamped(focal + z, (focal + z) * 0.0025, zoomDelta);
+        if (depth >= 0)
+            depth = -0.00000000000000000000000000000000001;
 
         float px = (float)(focal * x / depth);
         float py = (float)(focal * y / depth);
