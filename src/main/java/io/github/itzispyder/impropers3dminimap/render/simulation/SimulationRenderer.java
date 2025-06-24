@@ -1,20 +1,22 @@
 package io.github.itzispyder.impropers3dminimap.render.simulation;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import io.github.itzispyder.impropers3dminimap.render.animation.Animator;
 import io.github.itzispyder.impropers3dminimap.util.math.Color;
 import io.github.itzispyder.impropers3dminimap.util.math.MathUtils;
+import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderConstants;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.*;
 import net.minecraft.world.BlockView;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,20 +69,7 @@ public class SimulationRenderer {
         if (empty)
             return;
 
-        RenderSystem.disableCull();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
-
-        BufferRenderer.drawWithGlobalProgram(draw);
-
-        RenderSystem.disableDepthTest();
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        simulation.getMethod().getLayer().draw(draw);
     }
 
     public void renderWorldHighlighted(MatrixStack matrices, Vec3d camera, Quaternionf rotation) {
@@ -97,20 +86,7 @@ public class SimulationRenderer {
         if (empty)
             return;
 
-        RenderSystem.disableCull();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
-
-        BufferRenderer.drawWithGlobalProgram(draw);
-
-        RenderSystem.disableDepthTest();
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderConstants.LINES.draw(draw);
     }
 
     public void renderEntities(DrawContext context, Vec3d camera, Quaternionf rotation) {
@@ -143,9 +119,7 @@ public class SimulationRenderer {
             buf.vertex(mat, x, y, 0).color(color);
         }
 
-        RenderUtils.beginRendering();
-        RenderUtils.drawBuffer(buf);
-        RenderUtils.finishRendering();
+        RenderUtils.drawBuffer(buf, RenderConstants.TRI_FAN);
     }
 
     public synchronized void update(BlockView world, BlockPos pos, boolean useMapColors, boolean highlight) {

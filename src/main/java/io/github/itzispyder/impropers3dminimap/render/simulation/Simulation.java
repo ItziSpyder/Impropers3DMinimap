@@ -1,9 +1,11 @@
 package io.github.itzispyder.impropers3dminimap.render.simulation;
 
+import com.mojang.blaze3d.vertex.VertexFormat;
 import io.github.itzispyder.impropers3dminimap.Impropers3DMinimap;
 import io.github.itzispyder.impropers3dminimap.util.math.Color;
 import io.github.itzispyder.impropers3dminimap.util.math.MathUtils;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.PlayerUtils;
+import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderConstants;
 import io.github.itzispyder.impropers3dminimap.util.minecraft.RenderUtils;
 import io.github.itzispyder.impropers3dminimap.util.misc.Dictionary;
 import net.minecraft.block.Block;
@@ -11,7 +13,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -108,9 +109,7 @@ public class Simulation {
         buf.vertex(mat, x, y + 3, 0).color(0xFF800000); // center
         buf.vertex(mat, x + size / 2F, y + size / 2F, 0).color(0xFF800000); // bottom right
 
-        RenderUtils.beginRendering();
-        RenderUtils.drawBuffer(buf);
-        RenderUtils.finishRendering();
+        RenderUtils.drawBuffer(buf, RenderConstants.TRI_STRIP);
     }
 
     public void update(int radius, boolean useMapColors, Dictionary<Block> targets) {

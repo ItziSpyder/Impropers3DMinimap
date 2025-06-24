@@ -2,8 +2,6 @@ package io.github.itzispyder.impropers3dminimap.render.animation;
 
 import io.github.itzispyder.impropers3dminimap.util.math.MathUtils;
 
-import static net.minecraft.util.math.ColorHelper.Argb.*;
-
 public class Animator {
 
     private long start, length;
@@ -86,7 +84,8 @@ public class Animator {
     }
 
     public static int transformColorOpacity(Animator animator, int hex) {
-        return getArgb((int)(255 * animator.getProgressClamped()), getRed(hex), getGreen(hex), getBlue(hex));
+        int alpha = (int)(0xFF * animator.getProgressClamped());
+        return (alpha << 24) | (hex & 0x00FFFFFF);
     }
 
     public long getLength() {
